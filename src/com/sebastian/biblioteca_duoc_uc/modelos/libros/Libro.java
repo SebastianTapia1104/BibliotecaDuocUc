@@ -8,6 +8,7 @@ public class Libro {
     private String autor;
     private int anoPublicacion;
     private boolean prestado; // True si está prestado - False si está disponible
+    private String idUsuarioPrestado;
 
     // CONSTRUCTOR
     public Libro(String idLibro, String titulo, String autor, int anoPublicacion) {
@@ -16,6 +17,7 @@ public class Libro {
         this.autor = autor;
         this.anoPublicacion = anoPublicacion;
         this.prestado = false;
+        this.idUsuarioPrestado = null;
     }
 
     // GETTERS
@@ -39,6 +41,10 @@ public class Libro {
         return prestado;
     }
     
+    public String getIdUsuarioPrestado() {
+        return idUsuarioPrestado;
+    }
+    
     // SETTERS
     public void setIdLibro(String idLibro) {
         this.idLibro = idLibro;
@@ -58,6 +64,10 @@ public class Libro {
 
     public void setPrestado(boolean prestado) {
         this.prestado = prestado;
+    }
+    
+    public void setIdUsuarioPrestado(String idUsuarioPrestado) {
+        this.idUsuarioPrestado = idUsuarioPrestado;
     }
     
     // MÉTODOS

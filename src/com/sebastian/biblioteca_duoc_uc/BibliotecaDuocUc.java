@@ -63,7 +63,6 @@ public class BibliotecaDuocUc {
                 }
             } catch (EntradaInvalidaException  e) {
                 System.out.println("Entrada inválida. Por favor, ingrese un número: " + e.getMessage());
-                scanner.nextLine();
                 opcionPrincipal = 0; // Bucle
             }
         } while (opcionPrincipal != 3);
@@ -154,27 +153,37 @@ public class BibliotecaDuocUc {
         if (libro.isPrestado()) {
             throw new LibroPrestadoException("El libro '" + libro.getTitulo() + "' (ID: " + idLibro + ") ya está prestado.");
         }
-        Usuario usuario = mapaUsuarios.get(idUsuario); // Obtiene el usuario por su ID
+        Usuario usuario = mapaUsuarios.get(idUsuario); // Obtiene ID de usuario
         if (usuario == null) {
-            System.out.println("Error interno: El usuario con ID '" + idUsuario + "' no está registrado.");
+            System.out.println("Error interno: El usuario con ID '" + idUsuario + "' no está registrado. Por favor, reinicie la sesión.");
             return;
         }
         libro.setPrestado(true);
+        libro.setIdUsuarioPrestado(idUsuario);
         String mensajeRegistro = "PRESTAMO: Libro '" + libro.getTitulo() + "' (ID: " + idLibro + ") prestado a Usuario '" + usuario.getNombre() + "' (RUT: " + usuario.getRut() + "-" + usuario.getDv() + ").";
         System.out.println(mensajeRegistro);
-        registrarEventoPrestamo(mensajeRegistro);
+        registrarEventoPrestamo(mensajeRegistro); // Registra el evento en el archivo
     }
 
     private static void devolverLibro(String idLibro) throws LibroNoEncontradoException {
-        Libro libro = buscarLibroPorId(idLibro);
+        Libro libro = buscarLibroPorId(idLibro); // Busca el libro
         if (!libro.isPrestado()) {
             System.out.println("El libro '" + libro.getTitulo() + "' (ID: " + idLibro + ") no estaba prestado.");
             return;
         }
+        if (usuarioActual == null) {
+            System.out.println("Error: No ha iniciado sesión. Debe iniciar sesión para devolver un libro.");
+            return;
+        }
+        if (!String.valueOf(usuarioActual.getIdUsuario()).equals(libro.getIdUsuarioPrestado())) {
+            System.out.println("Error: No puedes devolver el libro '" + libro.getTitulo() + "' porque no lo tienes prestado.");
+            System.out.println("Este libro está prestado al usuario con ID: " + libro.getIdUsuarioPrestado());
+            return;
+        }
         libro.setPrestado(false);
-        String mensajeRegistro = "DEVOLUCION: Libro '" + libro.getTitulo() + "' (ID: " + idLibro + ") devuelto.";
+        String mensajeRegistro = "DEVOLUCION: Libro '" + libro.getTitulo() + "' (ID: " + idLibro + ") devuelto por Usuario '" + usuarioActual.getNombre() + "' (RUT: " + usuarioActual.getRut() + "-" + usuarioActual.getDv() + ").";
         System.out.println(mensajeRegistro);
-        registrarEventoPrestamo(mensajeRegistro);
+        registrarEventoPrestamo(mensajeRegistro); // Registra el evento en el archivo
     }
 
     private static void listarLibros() {
@@ -323,7 +332,16 @@ public class BibliotecaDuocUc {
             Libro libro = buscarLibroPorId(idLibro);
             System.out.println("Información del libro: " + libro);
             if (libro.isPrestado()) {
-                System.out.println("Estado: ¡El libro se encuentra PRESTADO!");
+                String prestadoPorNombre = "desconocido";
+                if (libro.getIdUsuarioPrestado() != null) {
+                    Usuario u = mapaUsuarios.get(libro.getIdUsuarioPrestado());
+                    if (u != null) {
+                        prestadoPorNombre = u.getNombre();
+                    } else {
+                        prestadoPorNombre = "ID " + libro.getIdUsuarioPrestado() + " (usuario no encontrado)";
+                    }
+                }
+                System.out.println("Estado: ¡El libro se encuentra PRESTADO por " + prestadoPorNombre + "!");
             } else {
                 System.out.println("Estado: ¡El libro está DISPONIBLE!");
             }
