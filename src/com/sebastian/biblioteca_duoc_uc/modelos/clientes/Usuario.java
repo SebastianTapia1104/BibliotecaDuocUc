@@ -1,73 +1,80 @@
 package com.sebastian.biblioteca_duoc_uc.modelos.clientes;
 
-public class Usuario {
+import com.sebastian.biblioteca_duoc_uc.modelos.libros.Libro;
+
+import java.util.ArrayList;
+
+// Implementar comparable para usar TreeSet
+public class Usuario implements Comparable<Usuario> {
     
     // ATRIBUTOS
-    private int idUsuario;
     private String nombre;
-    private int rut; 
-    private String dv;
-    
-    private static int contadorIdUsuario = 1;
+    private String rut; // sin digito
+    private ArrayList<Libro> librosPrestados;
     
     //CONSTRUCTOR
-    public Usuario(String nombre, int rut, String dv) {
-        this.idUsuario = Usuario.contadorIdUsuario; 
+    public Usuario(String nombre, String rut) {
         this.nombre = nombre;
         this.rut = rut;
-        this.dv = dv;
-        Usuario.contadorIdUsuario++; // Incrementa el contador para el próximo usuario
+        this.librosPrestados = new ArrayList<>();
     }
 
     // GETTERS
-    public int getIdUsuario() {
-        return idUsuario;
-    }
-
     public String getNombre() {
         return nombre;
     }
 
-    public int getRut() {
+    public String getRut() {
         return rut;
     }
 
-    public String getDv() {
-        return dv;
-    }
-
-    public static int getContadorIdUsuario() {
-        return contadorIdUsuario;
+    public ArrayList<Libro> getLibrosPrestados() {
+        return librosPrestados;
     }
     
+    
     // SETTERS
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public void setRut(int rut) {
+    public void setRut(String rut) {
         this.rut = rut;
     }
 
-    public void setDv(String dv) {
-        this.dv = dv;
-    }
-
-    public static void setContadorIdUsuario(int contadorIdUsuario) {
-        Usuario.contadorIdUsuario = contadorIdUsuario;
-    }
     
     // MÉTODOS
+    public void prestarLibro(Libro libro) {
+        librosPrestados.add(libro);
+        libro.prestar(this.rut); // Asocia el préstamo al rut del usuario
+    }
+    
+    public void devolverLibro(Libro libro) {
+        librosPrestados.remove(libro);
+        libro.devolver(); // Libera el libro
+    }
+    
     @Override
     public String toString() {
-        return "ID Usuario: " + idUsuario + ", Nombre: " + nombre + ", RUT: " + rut + "-" + dv;
+        return String.format("%s (RUT: %s) - Libros Prestados: %d", nombre, rut, librosPrestados.size());
+    }
+    
+    // Comparación para ordenar por nombre (de usuarios)
+    @Override
+    public int compareTo(Usuario otro) {
+        return this.nombre.compareToIgnoreCase(otro.nombre);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Usuario)) return false;
+        return rut.equals(((Usuario) o).rut);
     }
 
-    public boolean verificarRutCompleto(int rutIngresado, String dvIngresado) {
-        return this.rut == rutIngresado && this.dv.equalsIgnoreCase(dvIngresado);
+    @Override
+    public int hashCode() {
+        return rut.hashCode();
     }
+    
 }

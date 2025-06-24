@@ -1,13 +1,14 @@
 package com.sebastian.biblioteca_duoc_uc.modelos.libros;
 
-public class Libro {
+// Implementar comparable para usar TreeSet
+public class Libro implements Comparable<Libro> {
     
     // ATRIBUTOS
     private String idLibro;
     private String titulo;
     private String autor;
     private int anoPublicacion;
-    private boolean prestado; // True si está prestado - False si está disponible
+    private boolean disponible; 
     private String idUsuarioPrestado;
 
     // CONSTRUCTOR
@@ -16,7 +17,7 @@ public class Libro {
         this.titulo = titulo;
         this.autor = autor;
         this.anoPublicacion = anoPublicacion;
-        this.prestado = false;
+        this.disponible = true;
         this.idUsuarioPrestado = null;
     }
 
@@ -37,8 +38,8 @@ public class Libro {
         return anoPublicacion;
     }
 
-    public boolean isPrestado() {
-        return prestado;
+    public boolean estaDisponible() {
+        return disponible;
     }
     
     public String getIdUsuarioPrestado() {
@@ -61,18 +62,47 @@ public class Libro {
     public void setAnoPublicacion(int anoPublicacion) {
         this.anoPublicacion = anoPublicacion;
     }
-
-    public void setPrestado(boolean prestado) {
-        this.prestado = prestado;
-    }
     
-    public void setIdUsuarioPrestado(String idUsuarioPrestado) {
-        this.idUsuarioPrestado = idUsuarioPrestado;
+    public void setIdUsuarioPrestado(String rut) {
+        this.idUsuarioPrestado = rut;
     }
     
     // MÉTODOS
+    public void prestar(String rut) {
+        this.disponible = false; // deja de estar disponible al prestarlo
+        this.idUsuarioPrestado = rut;
+    }
+    
+    public void devolver() {
+        this.disponible = true; // vuelve a estar disponible cuando se devuelve
+        this.idUsuarioPrestado = null;
+    }
+    
+    
     @Override
     public String toString() {
-        return "ID: " + idLibro + ", Título: " + titulo + ", Autor: " + autor + ", Año: " + anoPublicacion + ", Estado: " + (prestado ? "Prestado" : "Disponible");
+        return String.format("%s (%d) - %s [%s]", titulo, anoPublicacion, autor, disponible ? "Disponible" : "Prestado");
     }
+
+    
+    // Comparación para ordenar por titulo
+    @Override
+    public int compareTo(Libro otro) {
+        return this.titulo.compareToIgnoreCase(otro.titulo);
+    }
+    
+    // Comparación para evitar duplicados de Libros (idLibro para ser exactos)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // indica que son exactamente el mismo objeto
+        if (!(o instanceof Libro)) return false; // si no es un Libro, no compara
+        return idLibro.equals(((Libro) o).idLibro); 
+    }
+    
+    // Ayuda en la búsqueda de idLobro para realizar la comparación más rápido
+    @Override
+    public int hashCode() {
+        return idLibro.hashCode();
+    }
+    
 }
