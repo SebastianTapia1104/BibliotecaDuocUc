@@ -64,7 +64,7 @@ public class Main {
                             System.out.println("Nombre inválido, debe tener mínimo 3 letras.");
                             break;
                         }
-                        Usuario usuario = new Usuario(rut,nombre);
+                        Usuario usuario = new Usuario(nombre, rut);
                         if(biblioteca.registrarUsuario(usuario)) {
                             System.out.println("Usuario registrado exitosamente.");
                         } else {
